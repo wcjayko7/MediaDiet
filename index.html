@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Diet</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 { margin-bottom: 5px; }
+        p.subtitle { color: #666; margin-top: 0; margin-bottom: 25px; }
+
+        /* --- CONTROL PANEL --- */
+        .controls { 
+            margin-bottom: 20px; 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        /* Visual Separator between groups */
+        .divider { 
+            color: #ccc; 
+            font-weight: bold; 
+            margin: 0 5px; 
+            user-select: none;
+        }
+        
+        /* Button Styling */
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 20px; /* Pill shape */
+            font-size: 13px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        /* The Active State (Selected) */
+        button.active {
+            background-color: #007bff; /* Bright Blue */
+            color: white;
+            border-color: #0056b3;
+            box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+        }
+
+        /* --- CHART AREA --- */
+        #chart { 
+            width: 100%; 
+            height: 600px; 
+            border: 1px solid #eee; 
+            border-radius: 8px;
+            position: relative; /* Needed for tooltip positioning */
+        }
+
+        /* --- TOOLTIP STYLES --- */
+        .tooltip {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            pointer-events: none; /* Let mouse pass through */
+            font-size: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.1s;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Media Diet</h1>
+    <p class="subtitle">Percentage who say they regularly get news from each source (n=1500).</p>
+
+    <div class="controls">
+        <button id="btn-overall" class="active" onclick="updateChart('overall')">Overall</button>
+        
+        <span class="divider">|</span>
+        
+        <button id="btn-dem" onclick="updateChart('dem')">Democrats</button>
+        <button id="btn-rep" onclick="updateChart('rep')">Republicans</button>
+        
+        <span class="divider">|</span>
+        
+        <button id="btn-male" onclick="updateChart('male')">Men</button>
+        <button id="btn-female" onclick="updateChart('female')">Women</button>
+
+        <span class="divider">|</span>
+        
+        <button id="btn-age18" onclick="updateChart('age18')">18-29</button>
+        <button id="btn-age30" onclick="updateChart('age30')">30-49</button>
+        <button id="btn-age50" onclick="updateChart('age50')">50-64</button>
+        <button id="btn-age65" onclick="updateChart('age65')">65+</button>
+    </div>
+
+    <div id="chart"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="chart.js"></script>
+
+</body>
+</html>
