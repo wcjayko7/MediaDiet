@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Diet Research | Center for Environment, Community, & Equity</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: #333;
+            background-color: #f9f9f9;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #111;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* CARD GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 20px;
+        }
+
+        /* CARD STYLES */
+        .card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 30px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none; /* Remove link underline */
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            border-color: #bbb;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .card p {
+            color: #555;
+            font-size: 0.95em;
+            margin-bottom: 20px;
+        }
+
+        .card .btn {
+            display: inline-block;
+            background: #eee;
+            color: #333;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .card:hover .btn {
+            background: #007bff;
+            color: white;
+        }
+
+        /* Mobile Fix */
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.85em;
+            color: #999;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Media Diet & changes in 2025</h1>
+        <p class="subtitle">Exploring how different demographic groups consume news media and how it shifted.</p>
+    </header>
+
+    <div class="grid">
+        <a href="popularity.html" class="card">
+            <div>
+                <h2>US Media Diet October 2025</h2>
+                <p>Where the population say they regularly get news from</p>
+            </div>
+            <div class="btn">Data Visualizations &rarr;</div>
+        </a>
+
+        <a href="diff.html" class="card">
+            <div>
+                <h2>US Media Diet Changes 2025</h2>
+                <p>Differences in where the population say they regularly get news from in March and October 2025</p>
+            </div>
+            <div class="btn">Data Visualizations  &rarr;</div>
+        </a>
+    </div>
+
+    <footer>
+        <p>
+            Research Data: Pew Research Center (March 2025) & YouGov/CECE (Oct 2025).<br>
+            Visualization created for the Center for Environment, Community, & Equity.
+        </p>
+    </footer>
+
+</body>
+</html>
