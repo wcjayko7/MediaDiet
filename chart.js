@@ -124,13 +124,13 @@ d3.json("data.json").then(data => {
         .join("text")
         // 2. CHECK: Is this source in the Top 10?
         .text(d => top10Names.has(d.source) ? d.source : "") 
-        .attr("font-size", "10px")
+        .attr("font-size", "8px")
         .attr("font-weight", "bold")
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
-        .attr("fill", "white")
+        .attr("fill", "black")
         .style("pointer-events", "none")
-        .style("text-shadow", "1px 1px 2px rgba(0,0,0,0.5)");
+
 
     // --- SIMULATION ---
     const simulation = d3.forceSimulation(data)
@@ -166,4 +166,5 @@ d3.json("data.json").then(data => {
         // Restart
         simulation.alpha(1).restart();
     };
+
 });
