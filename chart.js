@@ -41,23 +41,25 @@ d3.json("data.json").then(data => {
     // --- SCALES ---
     // X Axis Scale
     const x = d3.scaleLinear()
-        .domain([0, 70]) 
+        .domain([0, 60]) 
         .range([margin.left, width - margin.right]);
 
-    // Size Scale (Proportional to 'overall' usage)
-    // Range: Smallest bubble is 15px, largest is 45px radius
-    const size = d3.scaleSqrt()
-        .domain([0, 100])
-        .range([5, 50]); 
+    const size = d3.scaleLinear()
+        .domain([0, 35]) 
+        .range([2, 50]); // Max bubble size 50px
 
-// --- AXIS & GRID LINES ---
-    
+    const opacityScale = d3.scaleLinear()
+        .domain([0, 20])
+        .range([0.3, 1]);
+
+    // --- AXIS & GRID LINES ---
+    const gridTicks = [0, 10, 20, 30, 40, 50, 60, 70];
     // 1. Draw Grid Lines (Dotted)
     svg.append("g")
         .attr("class", "grid")
         .attr("transform", `translate(0, ${height - 50})`) // Position at bottom
         .call(d3.axisBottom(x)
-            .ticks(10)
+            .ticks(6)
             .tickSize(-(height - 100)) // Extend lines UPWARD by height of chart
             .tickFormat("") // No numbers on the grid lines
         )
@@ -66,12 +68,68 @@ d3.json("data.json").then(data => {
         .attr("opacity", 0.2); // Very faint light grey
 
     // 2. Draw Axis Labels (The Numbers)
-    const xAxis = d3.axisBottom(x).ticks(10).tickFormat(d => d + "%");
+    const xAxis = d3.axisBottom(x).ticks(6).tickFormat(d => d + "%");
     svg.append("g")
         .attr("transform", `translate(0, ${height - 50})`)
         .call(xAxis)
         .style("font-size", "14px")
         .style("opacity", 0.5);
+    // --- SIZE LEGEND (New Section) ---
+    // We place this in the top right corner
+    const legendValues = [5, 10, 20];
+    const legendX = width - 250;
+    const legendY = 100; 
+
+    const legend = svg.append("g")
+        .attr("class", "legend")
+        .attr("transform", `translate(${legendX}, ${legendY})`);
+
+    // Title
+    const legendTitle = legend.append("text")
+        .attr("x", 100)
+        .attr("y", -40) // Moved up slightly to fit 2 lines
+        .attr("text-anchor", "left")
+        .attr("font-size", "11px")
+        .attr("font-weight", "bold")
+        .attr("fill", "#666");
+
+    legendTitle.append("tspan")
+        .text("Bubble size represents the")
+        .attr("x", 30)
+        .attr("dy", "0em");
+
+    legendTitle.append("tspan")
+        .text("magnitude of percent")
+        .attr("x", 30)
+        .attr("dy", "1.2em"); // Next line down
+
+    legendTitle.append("tspan")
+        .text("in the overall sample")
+        .attr("x", 30)
+        .attr("dy", "1.2em"); // Next line down
+
+    // Draw Nested Circles
+    legend.selectAll("circle")
+        .data(legendValues)
+        .join("circle")
+        .attr("cx", 0)
+        .attr("cy", d => -size(d)) // Shift up so they share a bottom point
+        .attr("r", d => size(d))
+        .attr("fill", "none")
+        .attr("stroke", "#bbb")
+        .attr("stroke-dasharray", "2,2"); // Dotted lines
+
+    // Draw Text Labels on top of circles
+    legend.selectAll(".val-label")
+        .data(legendValues)
+        .join("text")
+        .attr("class", "val-label")
+        .attr("x", 0)
+        .attr("y", d => -size(d) * 2 - 2) // Place at the very top of each ring
+        .text(d => d + "%")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "10px")
+        .attr("fill", "#999");
 
     // --- DRAW BUBBLES ---
     let currentKey = "overall";
@@ -83,9 +141,6 @@ d3.json("data.json").then(data => {
         // CHANGED: Size is now permanent based on 'overall' score
         .attr("r", d => size(d.overall)) 
         .attr("fill", "#69b3a2")
-        .attr("stroke", "white")
-        .attr("stroke-width", 2)
-        .attr("opacity", 1)
         // --- HOVER EVENTS ---
         .on("mouseover", function(event, d) {
             d3.select(this).attr("fill", "#4e8a7c").attr("stroke", "#333");
@@ -124,7 +179,7 @@ d3.json("data.json").then(data => {
         .join("text")
         // 2. CHECK: Is this source in the Top 10?
         .text(d => top10Names.has(d.source) ? d.source : "") 
-        .attr("font-size", "8px")
+        .attr("font-size", "10px")
         .attr("font-weight", "bold")
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
@@ -168,3 +223,4 @@ d3.json("data.json").then(data => {
     };
 
 });
+
