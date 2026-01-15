@@ -5,7 +5,7 @@ const margin = { top: 50, right: 50, bottom: 50, left: 50 };
 
 // --- LABELS DICTIONARY ---
 const displayNames = {
-    "overall": "All US Adults",
+    "overall": "Overall",
     "dem": "Democrats",
     "rep": "Republicans",
     "male": "Men",
@@ -53,7 +53,7 @@ d3.json("data.json").then(data => {
         .range([0.3, 1]);
 
     // --- AXIS & GRID LINES ---
-    const gridTicks = [0, 10, 20, 30, 40, 50, 60, 70];
+    const gridTicks = [0, 10, 20, 30, 40, 50, 60];
     // 1. Draw Grid Lines (Dotted)
     svg.append("g")
         .attr("class", "grid")
@@ -152,7 +152,7 @@ d3.json("data.json").then(data => {
             tooltip.html(`
                 <strong>${d.source}</strong><br/>
                 ${humanLabel}: ${d[currentKey]}%<br/>
-                <small style="color:#666">(All US Adults: ${d.overall}%)</small>
+                <small style="color:#666">(Overall: ${d.overall}%)</small>
             `)
             .style("left", (event.pageX + 10) + "px")
             .style("top", (event.pageY - 28) + "px");
@@ -162,37 +162,34 @@ d3.json("data.json").then(data => {
             tooltip.transition().duration(500).style("opacity", 0);
         });
 
-    // --- DRAW LABELS (Top 10 Only) ---
-    
-    // 1. Find the Top 10 Sources by 'overall' score
-    // We sort a copy of the data (descending) and take the first 10 names
-    const top10Names = new Set(
+   // --- PREPARE LABELS (Text is empty at first) ---
+    const label = svg.append("g")
+        .selectAll("text")
+        .data(data)
+        .join("text")
+        .text("") // We set text in updateChart now
+        .attr("font-size", "10px")
+        .attr("font-weight", "bold")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .attr("fill", "white")
+        .style("pointer-events", "none")
+        .style("text-shadow", "1px 1px 2px rgba(0,0,0,0.5)");
+
+    // --- CALCULATE STATIC WINNERS (Top 10 Overall) ---
+    // These get saved once and never disappear
+    const top10Overall = new Set(
         [...data]
         .sort((a, b) => b.overall - a.overall)
         .slice(0, 10)
         .map(d => d.source)
     );
 
-    const label = svg.append("g")
-        .selectAll("text")
-        .data(data)
-        .join("text")
-        // 2. CHECK: Is this source in the Top 10?
-        .text(d => top10Names.has(d.source) ? d.source : "") 
-        .attr("font-size", "10px")
-        .attr("font-weight", "bold")
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "middle")
-        .attr("fill", "black")
-        .style("pointer-events", "none")
-
-
     // --- SIMULATION ---
     const simulation = d3.forceSimulation(data)
         .force("x", d3.forceX(d => x(d[currentKey])).strength(0.5))
         .force("y", d3.forceY(height / 2).strength(0.08)) 
-        // CHANGED: Collision based on dynamic 'overall' size
-        .force("collide", d3.forceCollide(d => size(d.overall) + 2))
+        .force("collide", d3.forceCollide(d => size(d.overall) + 1))
         .on("tick", ticked);
 
     function ticked() {
@@ -203,25 +200,35 @@ d3.json("data.json").then(data => {
     // --- UPDATE FUNCTION ---
     window.updateChart = function(key) {
         if (!data[0].hasOwnProperty(key)) return;
-
         currentKey = key;
 
-        // Highlight Buttons
         d3.selectAll(".controls button").classed("active", false);
         d3.select("#btn-" + key).classed("active", true);
 
-        // Stop animation briefly
+        // 1. CALCULATE DYNAMIC LABELS
+        // Find top 2 for THIS specific group
+        const top2ForGroup = new Set(
+            [...data]
+            .sort((a, b) => b[key] - a[key]) // Sort by currently clicked category
+            .slice(0, 2)
+            .map(d => d.source)
+        );
+
+        // 2. COMBINE LABELS (Set removes duplicates automatically)
+        const visibleLabels = new Set([...top10Overall, ...top2ForGroup]);
+
+        // 3. APPLY LABELS
+        label.text(d => visibleLabels.has(d.source) ? d.source : "");
+
         node.interrupt();
 
-        // Update Physics (Only X position changes; size is locked to overall)
         simulation.force("x", d3.forceX(d => x(d[currentKey])).strength(0.5));
-        // Re-assert collision based on overall size
-        simulation.force("collide", d3.forceCollide(d => size(d.overall) + 2));
+        simulation.force("collide", d3.forceCollide(d => size(d.overall) + 1));
         
-        // Restart
         simulation.alpha(1).restart();
     };
 
+    // Initialize
+    window.updateChart("overall");
 });
-
 

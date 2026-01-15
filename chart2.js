@@ -5,7 +5,7 @@ const margin = { top: 50, right: 50, bottom: 50, left: 50 };
 
 // LABELS MAP
 const displayNames = {
-    "overall": "All US Adults",
+    "overall": "All Adults",
     "dem": "Democrats",
     "rep": "Republicans",
     "age18": "Ages 18-29",
@@ -37,7 +37,7 @@ d3.json("data2.json").then(data => {
 
     // --- SCALES ---
     const x = d3.scaleLinear()
-        .domain([-20, 20]) 
+        .domain([-15, 15]) 
         .range([margin.left, width - margin.right]);
 
     const size = d3.scaleSqrt()
@@ -159,7 +159,7 @@ d3.json("data2.json").then(data => {
             tooltip.html(`
                 <strong>${d.source}</strong><br/>
                 ${humanLabel}: ${sign}${val}%<br/>
-                <small style="color:#666">(All US Adults Diff: ${overallVal}%)</small>
+                <small style="color:#666">(Overall diff: ${overallVal}%)</small>
             `)
             .style("left", (event.pageX + 10) + "px")
             .style("top", (event.pageY - 28) + "px");
@@ -169,25 +169,26 @@ d3.json("data2.json").then(data => {
             tooltip.transition().duration(500).style("opacity", 0);
         });
 
-    // --- DRAW LABELS ---
-    const top10Names = new Set(
-        [...data]
-        .sort((a, b) => Math.abs(b.overall || 0) - Math.abs(a.overall || 0))
-        .slice(0, 10)
-        .map(d => d.source)
-    );
-
+    // --- PREPARE LABELS (Initially Empty) ---
     const label = svg.append("g")
         .selectAll("text")
         .data(data)
         .join("text")
-        .text(d => top10Names.has(d.source) ? d.source : "") 
+        .text("") // Text is set in updateChart
         .attr("font-size", "11px")
         .attr("font-weight", "bold")
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
         .attr("fill", "black") 
         .style("pointer-events", "none"); 
+
+    // --- CALCULATE STATIC WINNERS (Top 10 Overall) ---
+    const top10Overall = new Set(
+        [...data]
+        .sort((a, b) => Math.abs(b.overall || 0) - Math.abs(a.overall || 0))
+        .slice(0, 10)
+        .map(d => d.source)
+    );
 
     // --- SIMULATION ---
     const simulation = d3.forceSimulation(data)
@@ -209,6 +210,30 @@ d3.json("data2.json").then(data => {
         d3.selectAll(".controls button").classed("active", false);
         d3.select("#btn-" + key).classed("active", true);
 
+        // 1. CALCULATE DYNAMIC LABELS
+        
+        // Find Top 2 POSITIVE (Largest numbers > 0)
+        const top2Pos = new Set(
+            [...data]
+            .sort((a, b) => (b[key] || 0) - (a[key] || 0)) // Sort Descending
+            .slice(0, 2)
+            .map(d => d.source)
+        );
+
+        // Find Top 2 NEGATIVE (Smallest numbers < 0)
+        const top2Neg = new Set(
+            [...data]
+            .sort((a, b) => (a[key] || 0) - (b[key] || 0)) // Sort Ascending
+            .slice(0, 2)
+            .map(d => d.source)
+        );
+
+        // 2. COMBINE ALL LABELS
+        const visibleLabels = new Set([...top10Overall, ...top2Pos, ...top2Neg]);
+
+        // 3. APPLY LABELS
+        label.text(d => visibleLabels.has(d.source) ? d.source : "");
+
         node.interrupt();
 
         node.transition().duration(750)
@@ -223,6 +248,4 @@ d3.json("data2.json").then(data => {
     };
 
     window.updateChart("overall");
-
 });
-
