@@ -5,7 +5,7 @@ const margin = { top: 50, right: 50, bottom: 50, left: 50 };
 
 // LABELS MAP
 const displayNames = {
-    "overall": "All Adults",
+    "overall": "Overall",
     "dem": "Democrats",
     "rep": "Republicans",
     "age18": "Ages 18-29",
@@ -159,7 +159,7 @@ d3.json("data2.json").then(data => {
             tooltip.html(`
                 <strong>${d.source}</strong><br/>
                 ${humanLabel}: ${sign}${val}%<br/>
-                <small style="color:#666">(Overall diff: ${overallVal}%)</small>
+                <small style="color:#666">(Overall Diff: ${overallVal}%)</small>
             `)
             .style("left", (event.pageX + 10) + "px")
             .style("top", (event.pageY - 28) + "px");
@@ -223,4 +223,5 @@ d3.json("data2.json").then(data => {
     };
 
     window.updateChart("overall");
+
 });
