@@ -5,7 +5,7 @@ const margin = { top: 50, right: 50, bottom: 50, left: 50 };
 
 // --- LABELS DICTIONARY ---
 const displayNames = {
-    "overall": "Overall",
+    "overall": "All US Adults",
     "dem": "Democrats",
     "rep": "Republicans",
     "male": "Men",
@@ -152,7 +152,7 @@ d3.json("data.json").then(data => {
             tooltip.html(`
                 <strong>${d.source}</strong><br/>
                 ${humanLabel}: ${d[currentKey]}%<br/>
-                <small style="color:#666">(Overall: ${d.overall}%)</small>
+                <small style="color:#666">(All US Adults: ${d.overall}%)</small>
             `)
             .style("left", (event.pageX + 10) + "px")
             .style("top", (event.pageY - 28) + "px");
@@ -223,4 +223,5 @@ d3.json("data.json").then(data => {
     };
 
 });
+
 
